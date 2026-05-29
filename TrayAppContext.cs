@@ -187,9 +187,8 @@ internal sealed class TrayAppContext : ApplicationContext
             _isRecording = true;
             SetRecordingUi(true);
             PlayBeep(start: true);
-            string lang = _captureLanguage is null ? "auto" : _captureLanguage.ToUpperInvariant();
             _overlay.ShowStatus(
-                $"●  {Localization.Get(Tr.Recording)} [{lang}]  ({Localization.Get(Tr.StopHint)})",
+                $"●  {Localization.Get(Tr.Recording)}  ({Localization.Get(Tr.StopHint)})",
                 Color.FromArgb(190, 40, 40));
         }
         catch (Exception ex)

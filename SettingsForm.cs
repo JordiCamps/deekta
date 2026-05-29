@@ -4,21 +4,25 @@ using System.Windows.Forms;
 namespace Deekta;
 
 /// <summary>
-/// Settings dialog. Grouped, friendlier layout:
-/// - OpenAI account: the key is shown masked once set; editing requires clicking "Change…".
-/// - Model: a dropdown with a short description of each transcription model.
-/// - Shortcut: modifier check boxes + a key dropdown (no "press the combination" capture).
-/// - Options: clearly labelled toggles with one-line hints.
+/// Two-column settings/about dialog:
+/// - Left: branding (icon, name, slogan), "how it works", a "get an OpenAI key" link, and
+///   the licence/credits + source link.
+/// - Right: the actual settings — masked API key (edited via "Change…"), model dropdown with a
+///   per-model price note, shortcut (modifier check boxes + key dropdown), and option toggles.
 /// Edits a clone of the settings; the caller reads <see cref="Settings"/>/<see cref="ApiKey"/> on OK.
 /// </summary>
 internal sealed class SettingsForm : Form
 {
-    private static readonly (string Id, Tr Desc)[] ModelChoices =
+    private static readonly (string Id, Tr Desc, string PricePerMin)[] ModelChoices =
     {
-        ("gpt-4o-mini-transcribe", Tr.ModelMiniDesc),
-        ("gpt-4o-transcribe", Tr.ModelFullDesc),
-        ("whisper-1", Tr.ModelWhisperDesc),
+        ("gpt-4o-mini-transcribe", Tr.ModelMiniDesc, "$0.003"),
+        ("gpt-4o-transcribe", Tr.ModelFullDesc, "$0.006"),
+        ("whisper-1", Tr.ModelWhisperDesc, "$0.006"),
     };
+
+    private const int LeftWidth = 300;
+    private static readonly Color PanelColor = Color.FromArgb(38, 40, 47);
+    private static readonly Color Accent = Color.FromArgb(120, 170, 245);
 
     // API key
     private readonly Label _keySummary = new();
@@ -31,6 +35,7 @@ internal sealed class SettingsForm : Form
     // Model
     private readonly ComboBox _modelCombo = new();
     private readonly Label _modelDesc = new();
+    private readonly Label _priceLabel = new();
 
     // Shortcut
     private readonly CheckBox _ctrl = new() { Text = "Ctrl" };
@@ -85,32 +90,120 @@ internal sealed class SettingsForm : Form
         ShowInTaskbar = true;
         Font = new Font("Segoe UI", 9f);
         BackColor = Color.White;
-        ClientSize = new Size(484, 612);
+        ClientSize = new Size(800, 596);
 
-        var intro = new Label
-        {
-            Text = Localization.Get(Tr.SettingsIntro),
-            Location = new Point(14, 10),
-            Size = new Size(458, 44),
-            AutoSize = false,
-            ForeColor = Color.FromArgb(90, 90, 95),
-        };
-        Controls.Add(intro);
+        BuildLeftPanel();
 
-        BuildApiGroup(top: 60);
-        BuildModelGroup(top: 166);
-        BuildShortcutGroup(top: 270);
-        BuildOptionsGroup(top: 384);
-        BuildButtons(top: 566);
+        // Right column: settings groups positioned to the right of the branding panel.
+        BuildApiGroup(top: 16);
+        BuildModelGroup(top: 122);
+        BuildShortcutGroup(top: 256);
+        BuildOptionsGroup(top: 370);
+        BuildButtons(top: 550);
     }
+
+    // ---- Left (branding / about) -------------------------------------------
+
+    private void BuildLeftPanel()
+    {
+        var left = new Panel
+        {
+            Dock = DockStyle.Left,
+            Width = LeftWidth,
+            BackColor = PanelColor,
+        };
+
+        var logo = new PictureBox
+        {
+            Image = TrayIconFactory.CreateAppBitmap(56),
+            Size = new Size(56, 56),
+            SizeMode = PictureBoxSizeMode.Zoom,
+            Location = new Point(24, 26),
+            BackColor = Color.Transparent,
+        };
+        var name = new Label
+        {
+            Text = "deekta",
+            Location = new Point(90, 34),
+            AutoSize = true,
+            ForeColor = Color.White,
+            Font = new Font("Segoe UI", 20f, FontStyle.Bold),
+        };
+        var slogan = new Label
+        {
+            Text = Localization.Get(Tr.Slogan),
+            Location = new Point(24, 96),
+            Size = new Size(252, 40),
+            ForeColor = Color.FromArgb(180, 185, 195),
+            Font = new Font("Segoe UI", 9.5f),
+        };
+
+        var howHeader = new Label
+        {
+            Text = Localization.Get(Tr.HowItWorks),
+            Location = new Point(24, 152),
+            AutoSize = true,
+            ForeColor = Accent,
+            Font = new Font("Segoe UI", 10f, FontStyle.Bold),
+        };
+
+        left.Controls.Add(logo);
+        left.Controls.Add(name);
+        left.Controls.Add(slogan);
+        left.Controls.Add(howHeader);
+        left.Controls.Add(Step(Tr.Step1, 182));
+        left.Controls.Add(Step(Tr.Step2, 208));
+        left.Controls.Add(Step(Tr.Step3, 234));
+        left.Controls.Add(LeftLink(Tr.KeyGuideLink, 280, SystemLinks.OpenAiKeysUrl));
+
+        // Footer: licence + source link.
+        left.Controls.Add(new Label
+        {
+            Text = "MIT · by Jordee (@JordiCamps)",
+            Location = new Point(24, 540),
+            AutoSize = true,
+            ForeColor = Color.FromArgb(150, 155, 165),
+            Font = new Font("Segoe UI", 8.25f),
+        });
+        left.Controls.Add(LeftLink(Tr.SourceLink, 562, SystemLinks.RepoUrl));
+
+        Controls.Add(left);
+    }
+
+    private static Label Step(Tr key, int y) => new()
+    {
+        Text = Localization.Get(key),
+        Location = new Point(24, y),
+        Size = new Size(252, 22),
+        ForeColor = Color.FromArgb(220, 224, 230),
+        Font = new Font("Segoe UI", 9.5f),
+    };
+
+    private static LinkLabel LeftLink(Tr key, int y, string url)
+    {
+        var link = new LinkLabel
+        {
+            Text = Localization.Get(key),
+            Location = new Point(24, y),
+            AutoSize = true,
+            BackColor = PanelColor,
+            LinkColor = Color.FromArgb(150, 190, 250),
+            ActiveLinkColor = Color.White,
+            Font = new Font("Segoe UI", 9f),
+        };
+        link.LinkClicked += (_, _) => SystemLinks.Open(url);
+        return link;
+    }
+
+    // ---- Right (settings) --------------------------------------------------
 
     private GroupBox Group(Tr title, int top, int height)
     {
         var g = new GroupBox
         {
             Text = "  " + Localization.Get(title) + "  ",
-            Location = new Point(12, top),
-            Size = new Size(460, height),
+            Location = new Point(LeftWidth + 16, top),
+            Size = new Size(468, height),
             Font = new Font("Segoe UI", 9f, FontStyle.Bold),
         };
         Controls.Add(g);
@@ -123,31 +216,31 @@ internal sealed class SettingsForm : Form
         Location = new Point(x, y),
         Size = new Size(width, 18),
         ForeColor = Color.FromArgb(120, 120, 125),
-        Font = new Font("Segoe UI", 8.25f, FontStyle.Regular),
+        Font = new Font("Segoe UI", 8.25f),
     };
 
     private void BuildApiGroup(int top)
     {
         GroupBox g = Group(Tr.GrpApi, top, 98);
 
-        _keySummary.Font = new Font("Segoe UI", 9f, FontStyle.Regular);
+        _keySummary.Font = new Font("Segoe UI", 9f);
         _keySummary.ForeColor = Color.FromArgb(30, 120, 60);
         _keySummary.Location = new Point(14, 28);
         _keySummary.AutoSize = true;
 
         _keyChange.Text = Localization.Get(Tr.BtnChange);
         _keyChange.Size = new Size(96, 26);
-        _keyChange.Location = new Point(346, 24);
+        _keyChange.Location = new Point(354, 24);
         _keyChange.Click += (_, _) => SetKeyEditing(true);
 
         _keyBox.UseSystemPasswordChar = true;
         _keyBox.Location = new Point(14, 26);
-        _keyBox.Width = 430;
+        _keyBox.Width = 438;
         _keyBox.Font = new Font("Segoe UI", 9.5f);
 
         _keyHint.Text = Localization.Get(Tr.ApiKeyPlaceholder) + "   ·   " + Localization.Get(Tr.ApiKeyOnlyOpenAi);
         _keyHint.Location = new Point(14, 56);
-        _keyHint.Size = new Size(432, 32);
+        _keyHint.Size = new Size(440, 32);
         _keyHint.ForeColor = Color.FromArgb(120, 120, 125);
         _keyHint.Font = new Font("Segoe UI", 8.25f);
 
@@ -159,25 +252,41 @@ internal sealed class SettingsForm : Form
 
     private void BuildModelGroup(int top)
     {
-        GroupBox g = Group(Tr.GrpModel, top, 96);
+        GroupBox g = Group(Tr.GrpModel, top, 130);
 
         _modelCombo.DropDownStyle = ComboBoxStyle.DropDownList;
         _modelCombo.Location = new Point(14, 28);
-        _modelCombo.Width = 430;
+        _modelCombo.Width = 438;
         _modelCombo.Font = new Font("Segoe UI", 9.5f);
-        foreach ((string id, Tr _) in ModelChoices)
+        foreach ((string id, Tr _, string _) in ModelChoices)
         {
             _modelCombo.Items.Add(id);
         }
-        _modelCombo.SelectedIndexChanged += (_, _) => UpdateModelDesc();
+        _modelCombo.SelectedIndexChanged += (_, _) => UpdateModelInfo();
 
         _modelDesc.Location = new Point(16, 58);
-        _modelDesc.Size = new Size(428, 30);
+        _modelDesc.Size = new Size(436, 30);
         _modelDesc.ForeColor = Color.FromArgb(120, 120, 125);
         _modelDesc.Font = new Font("Segoe UI", 8.5f);
 
+        _priceLabel.Location = new Point(16, 90);
+        _priceLabel.Size = new Size(436, 16);
+        _priceLabel.ForeColor = Color.FromArgb(70, 70, 75);
+        _priceLabel.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+
+        var pricingLink = new LinkLabel
+        {
+            Text = Localization.Get(Tr.PricingLink),
+            Location = new Point(16, 108),
+            AutoSize = true,
+            Font = new Font("Segoe UI", 8.25f),
+        };
+        pricingLink.LinkClicked += (_, _) => SystemLinks.Open(SystemLinks.OpenAiPricingUrl);
+
         g.Controls.Add(_modelCombo);
         g.Controls.Add(_modelDesc);
+        g.Controls.Add(_priceLabel);
+        g.Controls.Add(pricingLink);
     }
 
     private void BuildShortcutGroup(int top)
@@ -210,7 +319,7 @@ internal sealed class SettingsForm : Form
         _keyCombo.SelectedIndexChanged += (_, _) => UpdateShortcutPreview();
 
         _shortcutPreview.Location = new Point(200, 58);
-        _shortcutPreview.Size = new Size(244, 22);
+        _shortcutPreview.Size = new Size(252, 22);
         _shortcutPreview.Font = new Font("Segoe UI", 9.5f, FontStyle.Bold);
         _shortcutPreview.ForeColor = Color.FromArgb(40, 90, 170);
 
@@ -236,16 +345,16 @@ internal sealed class SettingsForm : Form
         _beep.Font = new Font("Segoe UI", 9.5f);
 
         g.Controls.Add(_autoInsert);
-        g.Controls.Add(Hint(Localization.Get(Tr.AutoInsertHint), 34, 44, 420));
+        g.Controls.Add(Hint(Localization.Get(Tr.AutoInsertHint), 34, 44, 428));
         g.Controls.Add(_startup);
-        g.Controls.Add(Hint(Localization.Get(Tr.StartupHint), 34, 88, 420));
+        g.Controls.Add(Hint(Localization.Get(Tr.StartupHint), 34, 88, 428));
         g.Controls.Add(_beep);
-        g.Controls.Add(Hint(Localization.Get(Tr.BeepHint), 34, 132, 420));
+        g.Controls.Add(Hint(Localization.Get(Tr.BeepHint), 34, 132, 428));
         g.Controls.Add(new Label
         {
             Text = $"{Localization.Get(Tr.LblLanguage)}: {Localization.Get(Tr.LangNote)}",
             Location = new Point(14, 148),
-            Size = new Size(432, 16),
+            Size = new Size(440, 16),
             ForeColor = Color.FromArgb(150, 150, 155),
             Font = new Font("Segoe UI", 8f, FontStyle.Italic),
         });
@@ -258,7 +367,7 @@ internal sealed class SettingsForm : Form
             Text = Localization.Get(Tr.BtnSave),
             DialogResult = DialogResult.OK,
             Size = new Size(100, 30),
-            Location = new Point(268, top),
+            Location = new Point(LeftWidth + 268, top),
             Font = new Font("Segoe UI", 9f, FontStyle.Bold),
         };
         save.Click += Save_Click;
@@ -267,7 +376,7 @@ internal sealed class SettingsForm : Form
             Text = Localization.Get(Tr.BtnCancel),
             DialogResult = DialogResult.Cancel,
             Size = new Size(100, 30),
-            Location = new Point(374, top),
+            Location = new Point(LeftWidth + 384, top),
         };
 
         Controls.Add(save);
@@ -324,22 +433,25 @@ internal sealed class SettingsForm : Form
         int idx = _modelCombo.Items.IndexOf(model);
         if (idx < 0)
         {
-            // A model not in our known list (custom): add and select it.
-            idx = _modelCombo.Items.Add(model);
+            idx = _modelCombo.Items.Add(model); // custom model not in our list
         }
         _modelCombo.SelectedIndex = idx;
-        UpdateModelDesc();
+        UpdateModelInfo();
     }
 
-    private void UpdateModelDesc()
+    private void UpdateModelInfo()
     {
         string id = _modelCombo.SelectedItem as string ?? string.Empty;
         Tr? desc = null;
-        foreach ((string mId, Tr mDesc) in ModelChoices)
+        string? price = null;
+        foreach ((string mId, Tr mDesc, string mPrice) in ModelChoices)
         {
-            if (mId == id) { desc = mDesc; break; }
+            if (mId == id) { desc = mDesc; price = mPrice; break; }
         }
         _modelDesc.Text = desc is null ? string.Empty : Localization.Get(desc.Value);
+        _priceLabel.Text = price is null
+            ? string.Empty
+            : $"{Localization.Get(Tr.PriceNote, price)}   ·   {Localization.Get(Tr.PriceDisclaimer)}";
     }
 
     private void UpdateShortcutPreview()
@@ -390,8 +502,7 @@ internal sealed class SettingsForm : Form
                 return;
             }
         }
-        // Fallback to "D" if the saved key isn't in our list.
-        SelectKey(Keys.D);
+        SelectKey(Keys.D); // fallback if the saved key isn't in our list
     }
 
     private Keys SelectedKey() => _keyCombo.SelectedItem is KeyItem ki ? ki.Key : Keys.D;

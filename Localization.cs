@@ -26,6 +26,10 @@ internal enum Tr
     LblKeyChar, ShortcutPreview,
     ModelMiniDesc, ModelFullDesc, ModelWhisperDesc,
     AutoInsertHint, StartupHint, BeepHint, SettingsIntro,
+    // Two-column marketing panel + price
+    Slogan, HowItWorks, Step1, Step2, Step3,
+    KeyGuideLink, PricingLink, SourceLink,
+    PriceNote, PriceDisclaimer,
 }
 
 /// <summary>
@@ -126,6 +130,17 @@ internal static class Localization
         [Tr.ErrHotkeyModifier] = new[] { "The shortcut must include at least one modifier (Ctrl/Alt/Shift/Win).", "La drecera ha d'incloure almenys un modificador (Ctrl/Alt/Shift/Win).", "El atajo debe incluir al menos un modificador (Ctrl/Alt/Shift/Win).", "Le raccourci doit inclure au moins un modificateur (Ctrl/Alt/Maj/Win).", "La scorciatoia deve includere almeno un modificatore (Ctrl/Alt/Shift/Win).", "Das Kürzel muss mindestens einen Modifikator enthalten (Strg/Alt/Umschalt/Win)." },
 
         [Tr.OpenSettingsLink] = new[] { "⚙ Settings", "⚙ Configuració", "⚙ Configuración", "⚙ Paramètres", "⚙ Impostazioni", "⚙ Einstellungen" },
+
+        [Tr.Slogan] = new[] { "Voice dictation into any Windows app", "Dictat per veu a qualsevol app de Windows", "Dictado por voz en cualquier app de Windows", "Dictée vocale dans n'importe quelle app Windows", "Dettatura vocale in qualsiasi app di Windows", "Sprachdiktat in jede Windows-App" },
+        [Tr.HowItWorks] = new[] { "How it works", "Com funciona", "Cómo funciona", "Comment ça marche", "Come funziona", "So funktioniert's" },
+        [Tr.Step1] = new[] { "1 · Press your shortcut", "1 · Prem la teva drecera", "1 · Pulsa tu atajo", "1 · Appuyez sur votre raccourci", "1 · Premi la tua scorciatoia", "1 · Drücke dein Kürzel" },
+        [Tr.Step2] = new[] { "2 · Speak", "2 · Parla", "2 · Habla", "2 · Parlez", "2 · Parla", "2 · Sprich" },
+        [Tr.Step3] = new[] { "3 · The text is typed for you", "3 · El text s'escriu sol", "3 · El texto se escribe solo", "3 · Le texte s'écrit tout seul", "3 · Il testo viene scritto da solo", "3 · Der Text wird automatisch getippt" },
+        [Tr.KeyGuideLink] = new[] { "How do I get an OpenAI key?", "Com obtinc una clau d'OpenAI?", "¿Cómo consigo una clave de OpenAI?", "Comment obtenir une clé OpenAI ?", "Come ottengo una chiave OpenAI?", "Wie bekomme ich einen OpenAI-Schlüssel?" },
+        [Tr.PricingLink] = new[] { "See OpenAI pricing", "Veure preus d'OpenAI", "Ver precios de OpenAI", "Voir les tarifs OpenAI", "Vedi i prezzi di OpenAI", "OpenAI-Preise ansehen" },
+        [Tr.SourceLink] = new[] { "Source on GitHub", "Codi font a GitHub", "Código en GitHub", "Code source sur GitHub", "Codice su GitHub", "Quellcode auf GitHub" },
+        [Tr.PriceNote] = new[] { "≈ {0} per minute of audio", "≈ {0} per minut d'àudio", "≈ {0} por minuto de audio", "≈ {0} par minute d'audio", "≈ {0} al minuto di audio", "≈ {0} pro Audiominute" },
+        [Tr.PriceDisclaimer] = new[] { "Indicative — OpenAI sets the price and it may change.", "Orientatiu — el preu el fixa OpenAI i pot canviar.", "Orientativo — el precio lo fija OpenAI y puede cambiar.", "Indicatif — le prix est fixé par OpenAI et peut changer.", "Indicativo — il prezzo lo fissa OpenAI e può cambiare.", "Richtwert — OpenAI legt den Preis fest, Änderungen möglich." },
 
         [Tr.GrpApi] = new[] { "OpenAI account", "Compte d'OpenAI", "Cuenta de OpenAI", "Compte OpenAI", "Account OpenAI", "OpenAI-Konto" },
         [Tr.GrpModel] = new[] { "Transcription model", "Model de transcripció", "Modelo de transcripción", "Modèle de transcription", "Modello di trascrizione", "Transkriptionsmodell" },

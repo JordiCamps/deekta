@@ -12,6 +12,13 @@
     <RootNamespace>Deekta</RootNamespace>
     <Version>1.0.0</Version>
     <Product>deekta</Product>
+    <Authors>Jordee (@JordiCamps)</Authors>
+    <Company>Jordee (@JordiCamps)</Company>
+    <Copyright>© 2026 Jordee (@JordiCamps)</Copyright>
+    <Description>Lightweight Windows tray app for voice dictation into any app via OpenAI speech-to-text.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/JordiCamps/deekta</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <!-- The tray icon is generated at runtime; no embedded .ico needed. -->
   </PropertyGroup>
 

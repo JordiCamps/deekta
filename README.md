@@ -1,60 +1,103 @@
 # deekta
 
-App lleugera de **dictat per veu per a Windows** que viu a la *system tray*. Prems una drecera
-global, parles, tornes a prémer i el text transcrit (via OpenAI Speech-to-Text) s'escriu
-automàticament a l'aplicació activa. L'idioma de transcripció **segueix el teclat actiu** (CA, IT…).
+[![build](https://github.com/JordiCamps/deekta/actions/workflows/build.yml/badge.svg)](https://github.com/JordiCamps/deekta/actions/workflows/build.yml)
+![license](https://img.shields.io/badge/license-MIT-blue)
+![platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6)
+![.NET](https://img.shields.io/badge/.NET-8-512BD4)
 
-## Requisits
+**Voice dictation into any Windows app.** A lightweight system‑tray app: press a global
+shortcut, speak, press again — the text is transcribed with OpenAI and typed where your cursor is.
+The dictation language follows your active keyboard (CA, ES, IT…). UI in English, Catalan,
+Spanish, French, Italian and German.
 
-- Windows 10/11
-- [.NET 8 SDK](https://aka.ms/dotnet/download) (per compilar)
-- Una clau d'API d'OpenAI
+> _Screenshots / demo GIF: TODO._
 
-## Compilar i executar
+## Features
 
-```powershell
-dotnet restore
-dotnet build -c Release
-dotnet run -c Release
-```
+- 🎙️ Global hotkey (default **Ctrl + Alt + D**), single‑instance, lives in the tray.
+- ⌨️ Types the text directly (Unicode `SendInput`) — works even in apps that ignore `Ctrl+V`.
+- 🌐 Transcription language auto‑detected from the active keyboard layout.
+- 🪟 Multi‑language UI; modern status overlay with a clickable Settings link.
+- 🔒 API key stored encrypted with Windows DPAPI; never in plain text.
 
-L'executable queda a `bin\Release\net8.0-windows\deekta.exe`.
+## Install
 
-## Com obrir l'app
+**Option A — download (recommended):** grab the latest from
+[Releases](https://github.com/JordiCamps/deekta/releases):
+- `deekta-setup.exe` — installer (Start‑menu shortcut, uninstaller), or
+- `deekta.exe` — single self‑contained file (no install, no .NET required).
 
-- **Primer cop / configuració:** executa `deekta.exe`. Apareix la icona de micròfon a la *system tray*.
-  Si encara no has posat la clau d'API, **la finestra de Configuració s'obre sola**.
-- **Tornar a obrir Configuració:** torna a executar `deekta.exe` (per exemple des d'una drecera
-  a l'escriptori o el menú Inici). Com que és *single-instance*, no n'obre una segona còpia: porta
-  la Configuració de la instància que ja corre al davant.
-- També pots fer doble clic a la icona de la safata, o clicar el globus de notificació.
+**Option B — build from source:** see [Build from source](#build-from-source).
 
-## Ús
+## How to get an OpenAI API key (step by step)
 
-1. Posa el cursor on vulguis escriure (Notepad, navegador, Word, VS Code…).
-2. Prem la drecera (per defecte **Ctrl + Alt + D**) — apareix la barra vermella "Gravant…".
-3. Parla.
-4. Torna a prémer-la — el text es transcriu i **s'escriu sol** on hi havia el cursor.
+1. Go to **https://platform.openai.com/api-keys** and sign in (or create an account).
+2. Add a payment method under **Billing** — transcription is pay‑as‑you‑go (see pricing below).
+3. Click **“Create new secret key”**, give it a name, and **copy** the key (`sk-…`).
+   ⚠️ It's shown only once.
+4. Open **deekta → Settings**, paste the key, and **Save**.
 
-> Si la finestra activa té permisos d'administrador, Windows bloqueja l'escriptura automàtica;
-> en aquest cas el text es deixa al porta-retalls i l'enganxes amb Ctrl+V (deekta t'avisa).
+There's a **“How do I get an OpenAI key?”** link inside the Settings window too.
 
-## Configuració
+## Usage
 
-| Opció | Per defecte |
+1. Put the cursor where you want to write (Notepad, browser, Word, VS Code…).
+2. Press the shortcut (default **Ctrl + Alt + D**) — a red “Recording…” bar appears.
+3. Speak.
+4. Press it again — the text is transcribed and typed for you.
+
+> If the focused window runs **as administrator**, Windows blocks synthetic typing; deekta then
+> leaves the text on the clipboard so you can paste it with `Ctrl+V` (it tells you).
+
+## Configuration
+
+Open Settings from the tray icon, by re‑running `deekta.exe`, or by clicking the overlay's
+**⚙ Settings** link.
+
+| Option | Default |
 |---|---|
 | Model | `gpt-4o-mini-transcribe` |
-| Idioma | Automàtic (segueix el teclat actiu) |
-| Drecera | Ctrl + Alt + D |
-| Escriure automàticament | Activat |
-| Arrencar amb Windows | Desactivat |
-| So (beep) | Activat |
+| Language | Automatic (follows the active keyboard) |
+| Shortcut | Ctrl + Alt + D |
+| Type automatically | On |
+| Start with Windows | Off |
+| Sound feedback | On |
 
-- **Configuració i logs:** `%AppData%\deekta`
-- **Àudio temporal:** `%TEMP%\deekta` (s'esborra després de cada transcripció)
-- La clau d'API es desa xifrada amb **Windows DPAPI** (scope d'usuari); mai en text pla.
+- **Settings & logs:** `%AppData%\deekta` · **Temp audio:** `%TEMP%\deekta` (deleted after each use).
 
-## Límits (MVP)
+## Pricing
 
-Gravació màxima 120 s · timeout d'API 60 s · clips < 1 s s'ignoren · sense selecció de micròfon,
-overlay complet, postprocessat amb LLM ni restauració del porta-retalls.
+Transcription is billed by **audio length** (silence included), not by the resulting text.
+Approximate, **set by OpenAI and subject to change** — see
+[OpenAI pricing](https://openai.com/api/pricing):
+
+| Model | ≈ price | Notes |
+|---|---|---|
+| `gpt-4o-mini-transcribe` | ~$0.003 / min | Fast & cheap — default |
+| `gpt-4o-transcribe` | ~$0.006 / min | Highest accuracy |
+| `whisper-1` | ~$0.006 / min | Classic, broad compatibility |
+
+## Build from source
+
+Requires the [.NET 8 SDK](https://aka.ms/dotnet/download).
+
+```powershell
+dotnet build -c Release          # build
+dotnet run -c Release            # run
+
+# self-contained single-file exe:
+dotnet publish deekta.csproj -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
+  -p:EnableCompressionInSingleFile=true -o publish
+```
+
+The installer is built from `installer/deekta.iss` with [Inno Setup](https://jrsoftware.org/isinfo.php)
+(`iscc installer\deekta.iss`). CI builds both artifacts on each `v*` tag (see `.github/workflows`).
+
+## Roadmap
+
+See [TODO.md](TODO.md) — packaging (winget/Scoop), a landing page, and streaming transcription.
+
+## License
+
+[MIT](LICENSE) © 2026 **Jordee** ([@JordiCamps](https://github.com/JordiCamps)).
