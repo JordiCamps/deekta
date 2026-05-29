@@ -3,25 +3,47 @@
 Llista de millores pendents i idees a valorar. No tot s'ha de fer; serveix per no perdre-ho.
 
 ## Fet ✅
-- [x] **Llicència** aclarida → **MIT** (© 2026 Jordee).
-- [x] **Autoria** al codi: `<Authors>/<Company>/<Copyright>` al `deekta.csproj` + crèdit a la finestra.
-- [x] **Finestra a dues columnes** (esquerra: marca, "com funciona", enllaços, llicència; dreta: settings).
-- [x] **Guia de claus d'OpenAI**: secció al README + enllaç dins Settings.
-- [x] **Informació de preu** a la UI (per minut) + disclaimer + enllaç a OpenAI pricing.
-- [x] **Distribució**: `.exe` autònom (single-file) + **instal·lador** Inno Setup (`installer/deekta.iss`).
-- [x] **CI/Release** amb GitHub Actions (`build.yml` + `release.yml` en etiqueta `v*`).
-- [x] L'idioma ja no es mostra a la barra de gravació; primera línia d'instruccions visible.
+- [x] **Llicència** → **MIT** (© 2026 Jordee).
+- [x] **Autoria** al codi (`deekta.csproj`) + crèdit a la finestra.
+- [x] **Finestra a dues columnes** (marca / "com funciona" / enllaços / llicència | settings).
+- [x] **Guia de claus d'OpenAI**: README + enllaç dins Settings.
+- [x] **Informació de preu** a la UI (per minut) + disclaimer + enllaç.
+- [x] **Distribució**: `.exe` autònom (single-file) + **instal·lador** Inno Setup.
+- [x] **CI/Release** amb GitHub Actions (`build.yml` + `release.yml`).
+- [x] **Repo públic** amb descripció, homepage i topics.
+- [x] **Primera Release `v1.0.1`** publicada amb `deekta.exe` + `deekta-setup.exe`.
+- [x] **Historial net** (correus fora; commits com a Jordee + noreply).
 
 ## Publicació — pendent
-- [ ] Crear la primera **GitHub Release** (push d'etiqueta `v1.0.0` → CI genera exe + instal·lador).
-- [ ] Afegir **topics** al repo (windows, dictation, speech-to-text, openai, whisper, catalan…).
 - [ ] **Captures de pantalla / GIF** de demostració al README (placeholders posats).
-- [ ] **winget** (manifest a microsoft/winget-pkgs) i/o **Scoop** — millor un cop hi hagi Release estable.
-- [ ] Opcional: **landing page** (GitHub Pages) amb màrqueting i enllaç de descàrrega.
+- [ ] **GitHub Pages (landing)**: pàgina de màrqueting amb botó de descàrrega que apunti a
+      l'instal·lador de la **Release** (GitHub Releases ja és un host conegut i fiable — no cal cap
+      web externa de tercers). Enllaçar-hi eventualment la Microsoft Store.
+- [ ] **Microsoft Store**: empaquetar com a **MSIX** i publicar (compte de developer ~19 $ one-time;
+      la Store gestiona la signatura). Millora molt la **confiança** i la descobribilitat per a públic
+      no tècnic. Enllaçar-la des del README/landing.
+- [ ] **winget** i/o **Scoop** (un cop la Release sigui estable).
+- [ ] (Opcional) **Signatura de codi** (certificat) per evitar avisos de SmartScreen al `.exe`/instal·lador
+      distribuïts fora de la Store.
+
+## Estadístiques d'ús i cost
+- [ ] Investigar si l'API retorna el **consum de tokens** (camp `usage`) a la resposta de transcripció
+      dels models `gpt-4o[-mini]-transcribe`. Si no el retorna, **estimar el cost** a partir de la
+      **durada de l'àudio × preu/min** (la durada ja la tenim a `AudioRecorder`).
+- [ ] Desar un **registre local** per transcripció: data, hora, durada, tokens (si n'hi ha) i € estimats
+      (a `%AppData%\deekta`, sense desar mai el text transcrit).
+- [ ] **Pantalla d'estadístiques**: cost del dia/mes, minuts dictats, nombre de transcripcions… (queda xulo).
+
+## Transcripció en streaming (important)
+Canvia molt l'experiència (el text apareix mentre parles). Hi ha enfocaments coneguts i fiables.
+- [ ] Investigar `stream=true` a `/v1/audio/transcriptions` (`gpt-4o[-mini]-transcribe`) i/o la
+      **Realtime API**; confirmar preu i latència.
+- [ ] El streaming pot **revisar resultats enrere**. Enfocaments segurs (sense sorpreses):
+      - (a) mostrar el parcial **només a l'overlay** i inserir **només el text final**;
+      - (b) inserir per **segments "estables"** (commit) i **no tocar mai** el text ja escrit.
+- [ ] Recomanació: començar per (a)/(b) sense esborrar text ja inserit, per evitar conflictes amb el cursor.
 
 ## Millores de producte — pendent
-- [ ] Valorar **mode fosc** coherent per a la finestra.
-- [ ] (Opcional) Comptador local aproximat de minuts/cost de la sessió.
 - [ ] Retallar **silencis** abans d'enviar (estalvi de cost; els silencis es facturen).
 
 ## Monetització — llicència de pagament (futur)
@@ -29,32 +51,22 @@ Idea: la funció **"Arrencar amb Windows"** queda **desactivada** per defecte i 
 **per sempre** amb una compra única (POC ~1 €). Hauria de ser **raonablement difícil de hackejar**
 (assumint que cap app local és 100 % inviolable).
 
-- [ ] **Gate de funció:** bloquejar el toggle "Arrencar amb Windows" (i marcar-lo com a "Premium")
-      fins que hi hagi una llicència vàlida. Mostrar un botó "Desbloquejar (1 €)".
-- [ ] **Validació offline amb signatura asimètrica** (recomanat, sense servidor):
-      - L'app **incrusta una clau pública** (Ed25519/RSA). La llicència és un *token signat* amb la
-        teva **clau privada** (que mai surt del teu costat) → l'app en verifica la signatura offline.
-      - Falsificar-la requeriria la clau privada; copiar-la entre màquines es pot limitar **lligant**
-        el token a un **ID de màquina** (hash de dades de maquinari), tot i que això afegeix fricció
-        i casos límit (canvi de hardware). Per a un POC d'1 €, potser n'hi ha prou sense lligar-la.
-      - Desar la llicència a `%AppData%\deekta` (i validar a l'arrencada).
-- [ ] **Pagament:** plataforma que faci de *merchant of record* i gestioni l'IVA de la UE i l'emissió
-      de claus: **Lemon Squeezy**, **Paddle** o **Gumroad** (millor per a imports petits que Stripe sol).
-- [ ] **Flux d'activació:** camp "Introduir llicència" a Configuració → validar signatura → habilitar.
-- [ ] **Anti-tamper (moderat):** ofuscació del binari (.NET és decompilable), comprovacions de
-      signatura en més d'un punt; assumir que un usuari decidit ho pot pegar → l'objectiu és
-      "prou difícil", no impossible. Valorar una comprovació online opcional si algun dia cal més.
-
-## Transcripció en streaming (ajornat)
-- [ ] Investigar si el model/endpoint suporta **streaming** (`stream=true` a `/v1/audio/transcriptions`
-      per als `gpt-4o[-mini]-transcribe`, o la **Realtime API**) i si el **preu** és acceptable.
-- [ ] Consideració clau: el streaming retorna **resultats parcials que es poden revisar enrere**.
-      Opcions: (a) mostrar el parcial només a l'overlay i **inserir només el text final**;
-      (b) inserir progressivament només segments "estables". Decidir l'experiència abans d'implementar.
+- [ ] **Gate de funció:** bloquejar el toggle "Arrencar amb Windows" (marcar-lo "Premium") fins que
+      hi hagi llicència vàlida; botó "Desbloquejar (1 €)".
+- [ ] **Validació offline amb signatura asimètrica:** l'app incrusta una **clau pública** (Ed25519/RSA);
+      la llicència és un *token signat* amb la teva **clau privada** → verificació offline. Opcional:
+      lligar-la a un **ID de màquina** per evitar compartir-la (amb fricció en canvis de hardware).
+- [ ] **Pagament:** *merchant of record* que gestioni l'IVA UE i emeti claus — **Lemon Squeezy**,
+      **Paddle** o **Gumroad** (millor que Stripe sol per a imports petits).
+- [ ] **Flux d'activació:** camp "Introduir llicència" a Configuració → validar → habilitar.
+- [ ] **Anti-tamper (moderat):** ofuscació + comprovacions en més d'un punt; objectiu "prou difícil",
+      no impossible. Comprovació online opcional si algun dia cal més.
 
 ## Notes
 - **Com es factura:** es paga per la **durada de l'àudio** (silencis inclosos), no pel text.
   deekta ja ignora clips < 1 s i talla als 120 s, però no retalla pauses internes.
+- **Compte de Google Play developer:** **no serveix** per a deekta — és per a apps **Android**, no per a
+  Windows desktop. Per a Windows: GitHub Releases (fet), Microsoft Store (MSIX), winget/Scoop.
 - **Avalonia?** Valorat i **descartat de moment**: deekta és molt específic de Windows (hotkey global,
   SendInput, tray, DPAPI, registre, NAudio). La UI portable aportaria poc i la integració amb l'SO
   s'hauria de reescriure igualment per plataforma. WinForms és suficient i lleuger.
