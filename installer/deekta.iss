@@ -20,6 +20,8 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}/releases
 ; Per-user install — no administrator rights required.
 PrivilegesRequired=lowest
+; Paths below are relative to the repo root (this script lives in installer/).
+SourceDir=..
 DefaultDirName={localappdata}\Programs\{#MyAppName}
 DisableProgramGroupPage=yes
 DefaultGroupName={#MyAppName}
