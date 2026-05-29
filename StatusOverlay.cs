@@ -1,13 +1,16 @@
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace Deekta;
 
 /// <summary>
-/// A small always-on-top status banner shown near the bottom of the primary screen while
-/// recording / transcribing. It never takes focus (WS_EX_NOACTIVATE + ShowWithoutActivation),
-/// so the user's target application stays foreground and Ctrl+V pastes where the caret is.
-/// This is the primary visual feedback when tray balloons are suppressed by Windows.
+/// A small, modern always-on-top status banner shown near the bottom of the primary screen
+/// while recording / transcribing. Dark rounded card with a coloured accent bar on the left
+/// that conveys state, the status text, and a clickable "⚙ Settings" link on the right.
+///
+/// It never takes focus (WS_EX_NOACTIVATE + ShowWithoutActivation), so the user's target app
+/// stays foreground and typing lands where the caret is. Clicks still reach the link.
 /// </summary>
 internal sealed class StatusOverlay : Form
 {
@@ -15,8 +18,14 @@ internal sealed class StatusOverlay : Form
     private const int WS_EX_TOOLWINDOW = 0x00000080;
     private const int WS_EX_TOPMOST = 0x00000008;
 
+    private static readonly Color CardColor = Color.FromArgb(32, 33, 38);
+
+    private readonly Panel _accent = new();
     private readonly Label _label = new();
+    private readonly LinkLabel _settingsLink = new();
     private readonly System.Windows.Forms.Timer _autoHide = new();
+
+    public event EventHandler? SettingsClicked;
 
     public StatusOverlay()
     {
@@ -24,15 +33,40 @@ internal sealed class StatusOverlay : Form
         ShowInTaskbar = false;
         TopMost = true;
         StartPosition = FormStartPosition.Manual;
-        BackColor = Color.FromArgb(28, 28, 30);
-        Size = new Size(300, 52);
-        Opacity = 0.92;
+        BackColor = CardColor;
+        Size = new Size(404, 56);
+        Opacity = 0.97;
+        Padding = new Padding(0);
 
+        // Left accent bar — its colour reflects the current state.
+        _accent.Dock = DockStyle.Left;
+        _accent.Width = 5;
+        _accent.BackColor = Color.Gray;
+
+        // Clickable Settings link on the right.
+        _settingsLink.Dock = DockStyle.Right;
+        _settingsLink.Width = 116;
+        _settingsLink.TextAlign = ContentAlignment.MiddleCenter;
+        _settingsLink.Font = new Font("Segoe UI", 9f, FontStyle.Regular);
+        _settingsLink.LinkColor = Color.FromArgb(150, 180, 230);
+        _settingsLink.ActiveLinkColor = Color.White;
+        _settingsLink.LinkBehavior = LinkBehavior.HoverUnderline;
+        _settingsLink.Text = Localization.Get(Tr.OpenSettingsLink);
+        _settingsLink.Links.Add(0, _settingsLink.Text.Length);
+        _settingsLink.LinkClicked += (_, _) => SettingsClicked?.Invoke(this, EventArgs.Empty);
+
+        // Status text fills the middle. (Docked siblings added before the Fill control.)
         _label.Dock = DockStyle.Fill;
-        _label.TextAlign = ContentAlignment.MiddleCenter;
+        _label.TextAlign = ContentAlignment.MiddleLeft;
         _label.ForeColor = Color.White;
-        _label.Font = new Font("Segoe UI", 11f, FontStyle.Bold);
+        _label.Font = new Font("Segoe UI Semibold", 11f, FontStyle.Regular);
+        _label.Padding = new Padding(14, 0, 0, 0);
+
         Controls.Add(_label);
+        Controls.Add(_settingsLink);
+        Controls.Add(_accent);
+
+        ApplyRoundedRegion(14);
 
         _autoHide.Tick += (_, _) =>
         {
@@ -41,7 +75,6 @@ internal sealed class StatusOverlay : Form
         };
     }
 
-    // Don't activate when shown — keep focus on the user's app.
     protected override bool ShowWithoutActivation => true;
 
     protected override CreateParams CreateParams
@@ -62,7 +95,7 @@ internal sealed class StatusOverlay : Form
     }
 
     /// <summary>Shows a transient status that hides itself after <paramref name="ms"/>.</summary>
-    public void FlashStatus(string text, Color accent, int ms = 1200)
+    public void FlashStatus(string text, Color accent, int ms = 1400)
     {
         Render(text, accent);
         _autoHide.Stop();
@@ -79,14 +112,13 @@ internal sealed class StatusOverlay : Form
     private void Render(string text, Color accent)
     {
         _label.Text = text;
-        BackColor = accent;
+        _accent.BackColor = accent;
         PositionBottomCentre();
         if (!Visible)
         {
             Show();
         }
-        // Note: we deliberately do NOT call Activate()/BringToFront() — that could steal focus
-        // from the target window and break direct typing. TopMost handles z-order.
+        // No Activate()/BringToFront(): that could steal focus and break direct typing.
     }
 
     private void PositionBottomCentre()
@@ -94,7 +126,19 @@ internal sealed class StatusOverlay : Form
         Rectangle wa = Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(0, 0, 1280, 720);
         Location = new Point(
             wa.Left + (wa.Width - Width) / 2,
-            wa.Bottom - Height - 60);
+            wa.Bottom - Height - 64);
+    }
+
+    private void ApplyRoundedRegion(int radius)
+    {
+        int w = Width, h = Height, d = radius * 2;
+        using var path = new GraphicsPath();
+        path.AddArc(0, 0, d, d, 180, 90);
+        path.AddArc(w - d, 0, d, d, 270, 90);
+        path.AddArc(w - d, h - d, d, d, 0, 90);
+        path.AddArc(0, h - d, d, d, 90, 90);
+        path.CloseFigure();
+        Region = new Region(path);
     }
 
     protected override void Dispose(bool disposing)

@@ -82,6 +82,8 @@ internal sealed class TrayAppContext : ApplicationContext
 
         _hotkey.HotkeyPressed += OnHotkeyPressed;
         _recorder.MaxDurationReached += OnMaxDurationReached;
+        // The overlay's visible "⚙ Settings" link opens Settings (runs on the UI thread).
+        _overlay.SettingsClicked += (_, _) => OpenSettings();
 
         // Hidden window used to marshal background signals onto the UI thread.
         _marshalWindow = new MarshalWindow(OnShowSettingsRequested);
@@ -123,6 +125,11 @@ internal sealed class TrayAppContext : ApplicationContext
         // Runs on the UI thread (via the hidden window's WndProc); capture the context so
         // the off-thread max-duration timer can marshal back here.
         _uiContext ??= SynchronizationContext.Current;
+
+        if (_settingsForm is not null)
+        {
+            return; // Settings dialog is open; don't start dictating into it.
+        }
 
         if (_isBusy)
         {
@@ -272,6 +279,35 @@ internal sealed class TrayAppContext : ApplicationContext
         }
     }
 
+    /// <summary>
+    /// Stops and discards an in-progress recording (used when opening Settings). The audio is
+    /// not transcribed; the temp file is deleted once the recorder has released it.
+    /// </summary>
+    private void CancelRecordingIfAny()
+    {
+        if (!_isRecording)
+        {
+            return;
+        }
+
+        _isRecording = false;
+        SetRecordingUi(false);
+        _overlay.HideStatus();
+        PlayBeep(start: false);
+        Logger.Info("Recording cancelled to open Settings.");
+
+        // StopAsync awaits the WAV being closed; delete it off the UI thread afterwards.
+        _ = _recorder.StopAsync().ContinueWith(
+            t =>
+            {
+                if (t.Status == TaskStatus.RanToCompletion && t.Result.FilePath is string path)
+                {
+                    TryDeleteFile(path);
+                }
+            },
+            TaskScheduler.Default);
+    }
+
     // ---- UI helpers ---------------------------------------------------------
 
     private void SetRecordingUi(bool recording)
@@ -325,6 +361,10 @@ internal sealed class TrayAppContext : ApplicationContext
 
     private void OpenSettings()
     {
+        // Opening Settings while dictating would let the transcription type into the dialog,
+        // so stop and discard any in-progress recording first.
+        CancelRecordingIfAny();
+
         // Already open: just bring it to the front instead of stacking dialogs.
         if (_settingsForm is not null)
         {

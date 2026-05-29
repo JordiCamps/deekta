@@ -18,6 +18,14 @@ internal enum Tr
     WinTitle, LblApiKey, LblModel, LblLanguage, LangNote, LblHotkey,
     LblAutoInsert, LblStartup, LblBeep, BtnSave, BtnCancel, HotkeyPrompt,
     ErrModelEmpty, ErrHotkeyModifier,
+    // Overlay
+    OpenSettingsLink,
+    // Settings groups + richer controls
+    GrpApi, GrpModel, GrpShortcut, GrpOptions,
+    ApiKeyConfigured, BtnChange, ApiKeyPlaceholder, ApiKeyOnlyOpenAi,
+    LblKeyChar, ShortcutPreview,
+    ModelMiniDesc, ModelFullDesc, ModelWhisperDesc,
+    AutoInsertHint, StartupHint, BeepHint, SettingsIntro,
 }
 
 /// <summary>
@@ -103,18 +111,42 @@ internal static class Localization
         [Tr.ErrUnrecognized] = new[] { "Unrecognised OpenAI response.", "Resposta d'OpenAI no reconeguda.", "Respuesta de OpenAI no reconocida.", "Réponse OpenAI non reconnue.", "Risposta di OpenAI non riconosciuta.", "Unbekannte OpenAI-Antwort." },
 
         [Tr.WinTitle] = new[] { "deekta — Settings", "deekta — Configuració", "deekta — Configuración", "deekta — Paramètres", "deekta — Impostazioni", "deekta — Einstellungen" },
-        [Tr.LblApiKey] = new[] { "OpenAI API key:", "Clau d'API OpenAI:", "Clave de API de OpenAI:", "Clé API OpenAI :", "Chiave API OpenAI:", "OpenAI-API-Schlüssel:" },
+        [Tr.LblApiKey] = new[] { "OpenAI API key", "Clau d'API d'OpenAI", "Clave de API de OpenAI", "Clé API OpenAI", "Chiave API OpenAI", "OpenAI-API-Schlüssel" },
         [Tr.LblModel] = new[] { "Model:", "Model:", "Modelo:", "Modèle :", "Modello:", "Modell:" },
-        [Tr.LblLanguage] = new[] { "Language:", "Idioma:", "Idioma:", "Langue :", "Lingua:", "Sprache:" },
+        [Tr.LblLanguage] = new[] { "Language", "Idioma", "Idioma", "Langue", "Lingua", "Sprache" },
         [Tr.LangNote] = new[] { "Automatic — follows the active keyboard (EN, IT…)", "Automàtic — segueix el teclat actiu (CA, IT…)", "Automático — sigue el teclado activo (ES, IT…)", "Automatique — suit le clavier actif (FR, IT…)", "Automatico — segue la tastiera attiva (IT, EN…)", "Automatisch — folgt der aktiven Tastatur (DE, IT…)" },
         [Tr.LblHotkey] = new[] { "Shortcut:", "Drecera:", "Atajo:", "Raccourci :", "Scorciatoia:", "Tastenkürzel:" },
-        [Tr.LblAutoInsert] = new[] { "Type automatically:", "Escriure automàticament:", "Escribir automáticamente:", "Saisir automatiquement :", "Digita automaticamente:", "Automatisch tippen:" },
-        [Tr.LblStartup] = new[] { "Start with Windows:", "Arrencar amb Windows:", "Iniciar con Windows:", "Démarrer avec Windows :", "Avvia con Windows:", "Mit Windows starten:" },
-        [Tr.LblBeep] = new[] { "Sound (beep):", "So (beep):", "Sonido (beep):", "Son (bip) :", "Suono (beep):", "Ton (Beep):" },
+        [Tr.LblAutoInsert] = new[] { "Type the text automatically", "Escriure el text automàticament", "Escribir el texto automáticamente", "Saisir le texte automatiquement", "Digita il testo automaticamente", "Text automatisch eintippen" },
+        [Tr.LblStartup] = new[] { "Start deekta with Windows", "Arrencar deekta amb Windows", "Iniciar deekta con Windows", "Démarrer deekta avec Windows", "Avvia deekta con Windows", "deekta mit Windows starten" },
+        [Tr.LblBeep] = new[] { "Sound when recording starts/stops", "So en començar/aturar la gravació", "Sonido al empezar/parar la grabación", "Son au début/à la fin de l'enregistrement", "Suono all'inizio/fine della registrazione", "Ton bei Aufnahmestart/-stopp" },
         [Tr.BtnSave] = new[] { "Save", "Desar", "Guardar", "Enregistrer", "Salva", "Speichern" },
         [Tr.BtnCancel] = new[] { "Cancel", "Cancel·lar", "Cancelar", "Annuler", "Annulla", "Abbrechen" },
         [Tr.HotkeyPrompt] = new[] { "Press the combination…", "Prem la combinació…", "Pulsa la combinación…", "Appuyez sur la combinaison…", "Premi la combinazione…", "Tastenkombination drücken…" },
         [Tr.ErrModelEmpty] = new[] { "The model can't be empty.", "El model no pot estar buit.", "El modelo no puede estar vacío.", "Le modèle ne peut pas être vide.", "Il modello non può essere vuoto.", "Das Modell darf nicht leer sein." },
         [Tr.ErrHotkeyModifier] = new[] { "The shortcut must include at least one modifier (Ctrl/Alt/Shift/Win).", "La drecera ha d'incloure almenys un modificador (Ctrl/Alt/Shift/Win).", "El atajo debe incluir al menos un modificador (Ctrl/Alt/Shift/Win).", "Le raccourci doit inclure au moins un modificateur (Ctrl/Alt/Maj/Win).", "La scorciatoia deve includere almeno un modificatore (Ctrl/Alt/Shift/Win).", "Das Kürzel muss mindestens einen Modifikator enthalten (Strg/Alt/Umschalt/Win)." },
+
+        [Tr.OpenSettingsLink] = new[] { "⚙ Settings", "⚙ Configuració", "⚙ Configuración", "⚙ Paramètres", "⚙ Impostazioni", "⚙ Einstellungen" },
+
+        [Tr.GrpApi] = new[] { "OpenAI account", "Compte d'OpenAI", "Cuenta de OpenAI", "Compte OpenAI", "Account OpenAI", "OpenAI-Konto" },
+        [Tr.GrpModel] = new[] { "Transcription model", "Model de transcripció", "Modelo de transcripción", "Modèle de transcription", "Modello di trascrizione", "Transkriptionsmodell" },
+        [Tr.GrpShortcut] = new[] { "Global shortcut", "Drecera global", "Atajo global", "Raccourci global", "Scorciatoia globale", "Globales Tastenkürzel" },
+        [Tr.GrpOptions] = new[] { "Options", "Opcions", "Opciones", "Options", "Opzioni", "Optionen" },
+
+        [Tr.ApiKeyConfigured] = new[] { "✓ API key configured", "✓ Clau d'API configurada", "✓ Clave de API configurada", "✓ Clé API configurée", "✓ Chiave API configurata", "✓ API-Schlüssel konfiguriert" },
+        [Tr.BtnChange] = new[] { "Change…", "Canviar…", "Cambiar…", "Modifier…", "Cambia…", "Ändern…" },
+        [Tr.ApiKeyPlaceholder] = new[] { "Paste your OpenAI key — starts with “sk-”", "Enganxa la teva clau d'OpenAI — comença per «sk-»", "Pega tu clave de OpenAI — empieza por «sk-»", "Collez votre clé OpenAI — commence par « sk- »", "Incolla la tua chiave OpenAI — inizia con «sk-»", "Füge deinen OpenAI-Schlüssel ein — beginnt mit „sk-“" },
+        [Tr.ApiKeyOnlyOpenAi] = new[] { "Only OpenAI keys work with deekta.", "Només funcionen claus d'OpenAI amb deekta.", "Solo funcionan claves de OpenAI con deekta.", "Seules les clés OpenAI fonctionnent avec deekta.", "Con deekta funzionano solo chiavi OpenAI.", "Mit deekta funktionieren nur OpenAI-Schlüssel." },
+
+        [Tr.LblKeyChar] = new[] { "Key:", "Tecla:", "Tecla:", "Touche :", "Tasto:", "Taste:" },
+        [Tr.ShortcutPreview] = new[] { "Shortcut: {0}", "Drecera: {0}", "Atajo: {0}", "Raccourci : {0}", "Scorciatoia: {0}", "Tastenkürzel: {0}" },
+
+        [Tr.ModelMiniDesc] = new[] { "Fast and inexpensive. Best default for everyday dictation.", "Ràpid i econòmic. La millor opció per defecte per al dictat diari.", "Rápido y económico. La mejor opción por defecto para el dictado diario.", "Rapide et économique. Le meilleur choix par défaut au quotidien.", "Veloce ed economico. La scelta predefinita ideale per l'uso quotidiano.", "Schnell und günstig. Beste Voreinstellung für den Alltag." },
+        [Tr.ModelFullDesc] = new[] { "Highest accuracy. Slower and more expensive.", "Màxima precisió. Més lent i més car.", "Máxima precisión. Más lento y más caro.", "Précision maximale. Plus lent et plus cher.", "Massima precisione. Più lento e più costoso.", "Höchste Genauigkeit. Langsamer und teurer." },
+        [Tr.ModelWhisperDesc] = new[] { "Classic Whisper. Broad compatibility, good for long audio.", "Whisper clàssic. Àmplia compatibilitat, bo per a àudios llargs.", "Whisper clásico. Amplia compatibilidad, bueno para audios largos.", "Whisper classique. Large compatibilité, idéal pour les longs audios.", "Whisper classico. Ampia compatibilità, adatto agli audio lunghi.", "Klassisches Whisper. Breite Kompatibilität, gut für lange Audios." },
+
+        [Tr.AutoInsertHint] = new[] { "If off, the text is only copied to the clipboard.", "Si està desactivat, el text només es copia al porta-retalls.", "Si está desactivado, el texto solo se copia al portapapeles.", "Si désactivé, le texte est seulement copié dans le presse-papiers.", "Se disattivato, il testo viene solo copiato negli appunti.", "Wenn aus, wird der Text nur in die Zwischenablage kopiert." },
+        [Tr.StartupHint] = new[] { "Launches automatically when you sign in.", "S'inicia automàticament en iniciar sessió.", "Se inicia automáticamente al iniciar sesión.", "Se lance automatiquement à la connexion.", "Si avvia automaticamente all'accesso.", "Startet automatisch bei der Anmeldung." },
+        [Tr.BeepHint] = new[] { "A short sound confirms start and stop.", "Un so curt confirma l'inici i l'aturada.", "Un sonido corto confirma inicio y parada.", "Un son court confirme le début et l'arrêt.", "Un suono breve conferma avvio e arresto.", "Ein kurzer Ton bestätigt Start und Stopp." },
+        [Tr.SettingsIntro] = new[] { "Press your shortcut, speak, press again — the text is typed where your cursor is.", "Prem la drecera, parla, torna a prémer — el text s'escriu on tens el cursor.", "Pulsa el atajo, habla, vuelve a pulsar — el texto se escribe donde está el cursor.", "Appuyez sur le raccourci, parlez, ré-appuyez — le texte s'écrit où est le curseur.", "Premi la scorciatoia, parla, premi di nuovo — il testo viene scritto dove c'è il cursore.", "Kürzel drücken, sprechen, erneut drücken — der Text wird an der Cursorposition eingefügt." },
     };
 }
